@@ -7,6 +7,8 @@ name = "pypi"
 flask = "*"
 autopep8 = "*"
 marshmallow = "*"
+pymongo = {extras = ["srv"], version = "*"}
+python-dotenv = "*"
 
 [dev-packages]
 
