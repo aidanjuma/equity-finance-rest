@@ -21,5 +21,19 @@ def google_assets():
     return jsonify({'result': schema.dump(assets), 'prev_url': prev_url, 'next_url': next_url})
 
 
+@app.route('/google/quote/<ticker>', methods=['GET'])
+def google_quote(ticker: str):
+    market = None
+    if request.args:
+        market = str(request.args['market'])
+
+    with MongoProvider() as mongo:
+        assets: list(Asset) = mongo.getGoogleAssetsToQuote(ticker, market)
+
+    # TODO: Get quotes, jsonify, and return; implement GoogleFinanceProvider.
+
+    return {}
+
+
 if __name__ == '__main__':
     app.run(debug=True)

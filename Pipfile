@@ -9,6 +9,9 @@ autopep8 = "*"
 marshmallow = "*"
 pymongo = {extras = ["srv"], version = "*"}
 python-dotenv = "*"
+beautifulsoup4 = "*"
+lxml = "*"
+requests = "*"
 
 [dev-packages]
 
