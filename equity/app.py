@@ -21,18 +21,18 @@ def google_assets():
     return jsonify({'result': schema.dump(assets), 'prev_url': prev_url, 'next_url': next_url})
 
 
-@app.route('/google/quote/<ticker>', methods=['GET'])
-def google_quote(ticker: str):
+@app.route('/google/data/<ticker>', methods=['GET'])
+def google_assets_data(ticker: str):
     market = None
     if request.args:
         market = str(request.args['market'])
 
     with MongoProvider() as mongo:
-        assets: list(Asset) = mongo.getGoogleAssetsToQuote(ticker, market)
+        assets: list(Asset) = mongo.getGoogleAssetsToScrape(ticker, market)
 
-    # TODO: Get quotes, jsonify, and return; implement GoogleFinanceProvider.
+    # TODO: Get asset data, jsonify, and return.
 
-    return {}
+    return {'今から': '元気だよ～！'}
 
 
 if __name__ == '__main__':

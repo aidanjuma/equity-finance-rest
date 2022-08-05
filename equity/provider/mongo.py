@@ -17,9 +17,8 @@ class MongoProvider:
     def __exit__(self, exc_type, exc_value, traceback) -> None:
         self.client.close()
 
-    def __parseAssets(data) -> list:
+    def __parseAssets(self, data) -> list:
         assets = []
-
         for asset in data:
             asset_obj = Asset(ticker=asset['ticker'], market=asset['market'],
                               google_finance_url=asset['google_finance_url'])
@@ -38,7 +37,7 @@ class MongoProvider:
 
         return assets
 
-    def getGoogleAssetsToQuote(self, ticker: str, market: Union[str, None] = None):
+    def getGoogleAssetsToScrape(self, ticker: str, market: Union[str, None] = None):
         no_market = market == None
 
         collection = self.client.google.assets
@@ -53,7 +52,7 @@ class MongoProvider:
                 # No market supplied; retain default.
                 pass
 
-        data = collection.aggregate(pipeline=pipeline)
+        data = list(collection.aggregate(pipeline=pipeline))
         assets = self.__parseAssets(data)
 
         return assets
