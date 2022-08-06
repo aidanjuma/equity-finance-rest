@@ -1,10 +1,10 @@
-import json
 from equity.model.asset import Asset
-from equity.model.asset_data import AssetData
-from parsel import Selector
+from equity.provider.scraper import Scraper
 from selenium import webdriver
+from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
+from selenium.common.exceptions import NoSuchElementException
 from webdriver_manager.chrome import ChromeDriverManager
 
 
@@ -26,12 +26,26 @@ class GoogleFinanceProvider:
     def __exit__(self, exc_type, exc_value, traceback) -> None:
         self.DRIVER.quit()
 
-    def scrapeAssetData(self, asset: Asset):
+    def __rejectGoogleCookies(self) -> None:
+        try:
+            self.DRIVER.find_element(
+                By.XPATH, '//*[@id="yDmH0d"]/c-wiz/div/div/div/div[2]/div[1]/div[3]/div[1]/div[1]/form[1]/div/div/button').click()
+        except NoSuchElementException:
+            return
+
+    def getAssetData(self, asset: Asset):
         try:
             self.DRIVER.get(asset.google_finance_url)
-            # TODO: accept cookies, then proceed to scrape data from page.
+            self.__rejectGoogleCookies()
+            # TODO: Adequate wait for element to load/be visible et al.
         except TimeoutError:
             raise TimeoutError(
                 'Request to Google Finance timed out; please try again.')
         except Exception as err:
             raise Exception(f'An error has occurred: {err}')
+        finally:
+            scraper = Scraper(self.DRIVER.page_source)
+            # TODO: Finish Scraper class and return data as AssetData() object.
+            data = scraper.scrapeAssetPage()
+
+            return data
