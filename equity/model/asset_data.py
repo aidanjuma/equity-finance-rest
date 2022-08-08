@@ -2,15 +2,14 @@ from marshmallow import Schema, fields
 
 
 class AssetData():
-    def __init__(self, ticker: str, market: str, google_finance_url: str, label: str, currency: str, price: float, market_cap: int, price_range: dict, about: dict, news: dict) -> None:
+    def __init__(self, ticker: str, market: str, google_finance_url: str, label: str, currency: str, price: float, market_summary: dict, about: dict, news: dict) -> None:
         self.ticker = ticker
         self.market = market
         self.google_finance_url = google_finance_url
         self.label = label
         self.currency = currency
         self.price = price
-        self.market_cap = market_cap
-        self.price_range = price_range
+        self.market_summary = market_summary
         self.about = about
         self.news = news
 
@@ -25,7 +24,6 @@ class AssetDataSchema(Schema):
     label = fields.Str()
     currency = fields.Str()
     price = fields.Float()
-    market_cap = fields.Int()
-    price_range = fields.Dict()
+    market_summary = fields.Dict()
     about = fields.Dict()
     news = fields.Dict()
