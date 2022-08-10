@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 from equity.provider.mongo import MongoProvider
+from equity.provider.google import GoogleFinanceProvider
 from equity.model.asset import Asset, AssetSchema
 
 app = Flask(__name__)
@@ -30,7 +31,12 @@ def google_assets_data(ticker: str):
     with MongoProvider() as mongo:
         assets: list(Asset) = mongo.getGoogleAssetsToScrape(ticker, market)
 
-    # TODO: Get asset data, jsonify, and return.
+    data = []
+    with GoogleFinanceProvider() as google:
+        for asset in assets:
+            data.append(google.getAssetData(asset))
+
+    # TODO: jsonify and return.
 
     return {'今から': '元気だよ～！'}
 

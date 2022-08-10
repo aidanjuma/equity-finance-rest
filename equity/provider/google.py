@@ -12,6 +12,7 @@ class GoogleFinanceProvider:
 
     def __init__(self) -> None:
         __driver_options = Options()
+        __driver_options.add_argument('--lang=en')
         __driver_options.add_argument('--headless')
         __driver_options.add_argument('--incognito')
         __driver_options.add_argument(
@@ -44,7 +45,7 @@ class GoogleFinanceProvider:
         except Exception as err:
             raise Exception(f'An error has occurred: {err}')
         finally:
-            scraper = Scraper(self.DRIVER.page_source)
+            scraper = Scraper(html=self.DRIVER.page_source, asset=asset)
             # TODO: Finish Scraper class and return data as AssetData() object.
             data = scraper.scrapeAssetPage()
 
