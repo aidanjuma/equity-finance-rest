@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
-from equity.provider.mongo import MongoProvider
-from equity.provider.google import GoogleFinanceProvider
-from equity.model.asset import Asset, AssetSchema
+from equity.models.asset.asset_model import *
+from equity.providers.mongo.provider import MongoProvider
+from equity.providers.google.provider import GoogleFinanceProvider
 
 app = Flask(__name__)
 

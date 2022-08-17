@@ -2,7 +2,8 @@ import os
 import pymongo
 from typing import Union
 from dotenv import load_dotenv
-from equity.model.asset import Asset
+
+from equity.models.asset.asset_model import Asset
 
 load_dotenv()
 

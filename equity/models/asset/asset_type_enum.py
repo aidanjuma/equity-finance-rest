@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class Type(Enum):
+class AssetType(Enum):
     STOCK = 'stock'
     INDEX = 'index'
     FUTURE = 'future'

@@ -1,11 +1,12 @@
-from equity.model.asset import Asset
-from equity.provider.scraper import Scraper
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import NoSuchElementException
 from webdriver_manager.chrome import ChromeDriverManager
+
+from equity.models.asset.asset_model import Asset
+from equity.providers.google.scraper import GoogleFinanceScraper
 
 
 class GoogleFinanceProvider:
@@ -45,7 +46,8 @@ class GoogleFinanceProvider:
         except Exception as err:
             raise Exception(f'An error has occurred: {err}')
         finally:
-            scraper = Scraper(html=self.DRIVER.page_source, asset=asset)
+            scraper = GoogleFinanceScraper(
+                html=self.DRIVER.page_source, asset=asset)
             # TODO: Finish Scraper class and return data as AssetData() object.
             data = scraper.scrapeAssetPage()
 
