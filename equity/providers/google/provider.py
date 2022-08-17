@@ -2,7 +2,9 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
-from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from webdriver_manager.chrome import ChromeDriverManager
 
 from equity.models.asset.asset_model import Asset
@@ -39,16 +41,16 @@ class GoogleFinanceProvider:
         try:
             self.DRIVER.get(asset.google_finance_url)
             self.__rejectGoogleCookies()
-            # TODO: Adequate wait for element to load/be visible et al.
-        except TimeoutError:
-            raise TimeoutError(
+            WebDriverWait(self.DRIVER, timeout=3).until(
+                EC.presence_of_element_located((By.ID, 'wiz_jd')))
+        except TimeoutException:
+            raise TimeoutException(
                 'Request to Google Finance timed out; please try again.')
         except Exception as err:
             raise Exception(f'An error has occurred: {err}')
         finally:
             scraper = GoogleFinanceScraper(
                 html=self.DRIVER.page_source, asset=asset)
-            # TODO: Finish Scraper class and return data as AssetData() object.
             data = scraper.scrapeAssetPage()
 
             return data

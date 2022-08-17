@@ -68,7 +68,7 @@ class GoogleFinanceScraper:
             currency = market_currencies[self.ASSET.market]
             return currency
         except KeyError:
-            currency = ""
+            currency = ''
 
     def __scrapePrice(self):
         price_str = self.SELECTOR.css('div.YMlKec.fxKbKc::text').get()
@@ -136,10 +136,47 @@ class GoogleFinanceScraper:
             'dividend_yield': dividend_yield
         }
 
+    def __scrapeAbout(self):
+        try:
+            about = str(self.SELECTOR.css('div.bLLb2d::text').get())
+        except Exception:
+            return ''
+
+        return about
+
+    def __scrapeNews(self):
+        data = []
+        if self.SELECTOR.css('.yY3Lee').get():
+
+            for index, news in enumerate(self.SELECTOR.css('.yY3Lee'), start=1):
+                data.append(
+                    {
+                        'number': index,
+                        'title': news.css('.Yfwt5::text').get(),
+                        'link': news.css('.z4rs2b a::attr(href)').get(),
+                        'source': news.css('.sfyJob::text').get(),
+                        'published': news.css('.Adak::text').get(),
+                        'thumbnail': news.css('img.Z4idke::attr(src)').get()
+                    }
+                )
+
+        return data
+
     def scrapeAssetPage(self):
         label = self.__scrapeLabel()
         currency = self.__deduceCurrency()
         price = self.__scrapePrice()
         market_summary = self.__scrapeMarketSummary()
+        about = self.__scrapeAbout()
+        news = self.__scrapeNews()
 
-        # TODO: Rest of data...
+        return AssetData(ticker=self.ASSET.ticker,
+                         market=self.ASSET.market,
+                         google_finance_url=self.ASSET.google_finance_url,
+                         label=label,
+                         currency=currency,
+                         price=price,
+                         market_summary=market_summary,
+                         about=about,
+                         news=news
+                         )

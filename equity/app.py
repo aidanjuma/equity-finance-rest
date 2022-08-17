@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+from .models.asset.asset_data_model import AssetDataSchema
 from equity.models.asset.asset_model import *
 from equity.providers.mongo.provider import MongoProvider
 from equity.providers.google.provider import GoogleFinanceProvider
@@ -36,9 +37,9 @@ def google_assets_data(ticker: str):
         for asset in assets:
             data.append(google.getAssetData(asset))
 
-    # TODO: jsonify and return.
+    schema = AssetDataSchema(many=True)
 
-    return {'今から': '元気だよ～！'}
+    return jsonify({'result': schema.dump(data)})
 
 
 if __name__ == '__main__':
