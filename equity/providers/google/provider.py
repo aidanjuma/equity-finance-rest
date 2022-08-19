@@ -49,8 +49,24 @@ class GoogleFinanceProvider:
         except Exception as err:
             raise Exception(f'An error has occurred: {err}')
         finally:
-            scraper = GoogleFinanceScraper(
-                html=self.DRIVER.page_source, asset=asset)
-            data = scraper.scrapeAssetPage()
+            scraper = GoogleFinanceScraper(html=self.DRIVER.page_source)
+            data = scraper.scrapeAssetPage(asset=asset)
+
+            return data
+
+    def getNewsStories(self):
+        try:
+            self.DRIVER.get('https://www.google.com/finance')
+            self.__rejectGoogleCookies()
+            WebDriverWait(self.DRIVER, timeout=3).until(
+                EC.presence_of_element_located((By.ID, 'wiz_jd')))
+        except TimeoutException:
+            raise TimeoutException(
+                'Request to Google Finance timed out; please try again.')
+        except Exception as err:
+            raise Exception(f'An error has occurred: {err}')
+        finally:
+            scraper = GoogleFinanceScraper(html=self.DRIVER.page_source)
+            data = scraper.scrapeNewsStories()
 
             return data

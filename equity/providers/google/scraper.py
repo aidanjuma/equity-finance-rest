@@ -4,21 +4,20 @@ from parsel import Selector
 from equity.models.asset.asset_model import Asset
 from equity.models.asset.asset_data_model import AssetData
 from equity.models.asset.asset_type_enum import AssetType
+from equity.models.news.news_model import News
 from equity.providers.google.market_data import *
 
 
 class GoogleFinanceScraper:
 
-    def __init__(self, html: str, asset: Asset) -> None:
+    def __init__(self, html: str) -> None:
         self.SELECTOR = Selector(html)
-        self.ASSET = asset
 
     def __enter__(self) -> None:
         return self
 
     def __exit__(self, exc_type, exc_value, traceback) -> None:
         del self.SELECTOR
-        del self.ASSET
 
     def __makeStringFloatCompatible(self, string: str) -> str:
         # Exclude everything except numbers & '.' (decimal place) to make float compatible.
@@ -63,9 +62,9 @@ class GoogleFinanceScraper:
 
         return label
 
-    def __deduceCurrency(self):
+    def __deduceCurrency(self, market: str):
         try:
-            currency = market_currencies[self.ASSET.market]
+            currency = market_currencies[market]
             return currency
         except KeyError:
             currency = ''
@@ -146,33 +145,33 @@ class GoogleFinanceScraper:
 
     def __scrapeNews(self):
         data = []
-        if self.SELECTOR.css('.yY3Lee').get():
 
-            for index, news in enumerate(self.SELECTOR.css('.yY3Lee'), start=1):
+        if self.SELECTOR.css('.yY3Lee').get():
+            for i, news in enumerate(self.SELECTOR.css('.yY3Lee'), start=1):
                 data.append(
-                    {
-                        'number': index,
-                        'title': news.css('.Yfwt5::text').get(),
-                        'link': news.css('.z4rs2b a::attr(href)').get(),
-                        'source': news.css('.sfyJob::text').get(),
-                        'published': news.css('.Adak::text').get(),
-                        'thumbnail': news.css('img.Z4idke::attr(src)').get()
-                    }
+                    News(
+                        number=i,
+                        title=news.css('.Yfwt5::text').get(),
+                        link=news.css('.z4rs2b a::attr(href)').get(),
+                        source=news.css('.sfyJob::text').get(),
+                        published=news.css('.Adak::text').get(),
+                        thumbnail=news.css('img.Z4idke::attr(src)').get()
+                    )
                 )
 
         return data
 
-    def scrapeAssetPage(self):
+    def scrapeAssetPage(self, asset: Asset):
         label = self.__scrapeLabel()
-        currency = self.__deduceCurrency()
+        currency = self.__deduceCurrency(market=asset.market)
         price = self.__scrapePrice()
         market_summary = self.__scrapeMarketSummary()
         about = self.__scrapeAbout()
         news = self.__scrapeNews()
 
-        return AssetData(ticker=self.ASSET.ticker,
-                         market=self.ASSET.market,
-                         google_finance_url=self.ASSET.google_finance_url,
+        return AssetData(ticker=asset.ticker,
+                         market=asset.market,
+                         google_finance_url=asset.google_finance_url,
                          label=label,
                          currency=currency,
                          price=price,
@@ -180,3 +179,7 @@ class GoogleFinanceScraper:
                          about=about,
                          news=news
                          )
+
+    def scrapeNewsStories(self):
+        news = self.__scrapeNews()
+        return news

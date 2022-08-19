@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
-from .models.asset.asset_data_model import AssetDataSchema
+from equity.models.asset.asset_data_model import AssetDataSchema
 from equity.models.asset.asset_model import *
+from equity.models.news.news_model import *
 from equity.providers.mongo.provider import MongoProvider
 from equity.providers.google.provider import GoogleFinanceProvider
 
@@ -40,6 +41,17 @@ def google_assets_data(ticker: str):
     schema = AssetDataSchema(many=True)
 
     return jsonify({'result': schema.dump(data)})
+
+
+# Get news top stories; TODO -> Local, World Markets?
+@app.route('/google/news', methods=['GET'])
+def google_news():
+    with GoogleFinanceProvider() as google:
+        news: list(News) = google.getNewsStories()
+
+    schema = NewsSchema(many=True)
+
+    return jsonify({'result': schema.dump(news)})
 
 
 if __name__ == '__main__':
