@@ -1,7 +1,7 @@
 from marshmallow import Schema, fields
 
 
-class News():
+class GoogleMarketNews():
     def __init__(self, number: int, title: str, link: str, source: str, published: str, thumbnail: str) -> None:
         self.number = number
         self.title = title
@@ -14,7 +14,7 @@ class News():
         return '<News(name={self.title!r})>'.format(self=self)
 
 
-class NewsSchema(Schema):
+class GoogleMarketNewsSchema(Schema):
     number = fields.Int()
     title = fields.Str()
     link = fields.Str()

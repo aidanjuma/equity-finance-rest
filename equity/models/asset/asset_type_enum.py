@@ -6,3 +6,4 @@ class AssetType(Enum):
     INDEX = 'index'
     FUTURE = 'future'
     CURRENCY = 'currency'
+    CRYPTOCURRENCY = 'cryptocurrency'

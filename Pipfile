@@ -12,6 +12,7 @@ python-dotenv = "*"
 parsel = "*"
 selenium = "*"
 webdriver-manager = "*"
+requests = "*"
 
 [dev-packages]
 

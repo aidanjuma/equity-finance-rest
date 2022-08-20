@@ -7,7 +7,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from webdriver_manager.chrome import ChromeDriverManager
 
-from equity.models.asset.asset_model import Asset
+from equity.models.asset.google.asset_model import GoogleAsset
 from equity.providers.google.scraper import GoogleFinanceScraper
 
 
@@ -37,7 +37,7 @@ class GoogleFinanceProvider:
         except NoSuchElementException:
             return
 
-    def getAssetData(self, asset: Asset):
+    def getAssetData(self, asset: GoogleAsset):
         try:
             self.DRIVER.get(asset.google_finance_url)
             self.__rejectGoogleCookies()

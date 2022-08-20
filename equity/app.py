@@ -1,9 +1,12 @@
 from flask import Flask, request, jsonify
-from equity.models.asset.asset_data_model import AssetDataSchema
-from equity.models.asset.asset_model import *
-from equity.models.news.news_model import *
+
+from equity.models.asset.google.asset_data_model import GoogleAssetDataSchema
+from equity.models.asset.google.asset_model import *
+from equity.models.news.google.news_model import *
+from equity.models.asset.binance.asset_model import *
 from equity.providers.mongo.provider import MongoProvider
 from equity.providers.google.provider import GoogleFinanceProvider
+from equity.providers.binance.provider import BinanceProvider
 
 app = Flask(__name__)
 
@@ -14,12 +17,13 @@ def google_assets():
     offset = int(request.args['offset'])
 
     with MongoProvider() as mongo:
-        assets: list(Asset) = mongo.getGoogleAssets(limit=limit, offset=offset)
+        assets: list(GoogleAsset) = mongo.getGoogleAssets(
+            limit=limit, offset=offset)
 
     prev_url = f'/google/assets?limit={limit}&offset={offset - limit}'
     next_url = f'/google/assets?limit={limit}&offset={offset + limit}'
 
-    schema = AssetSchema(many=True)
+    schema = GoogleAssetSchema(many=True)
 
     return jsonify({'result': schema.dump(assets), 'prev_url': prev_url, 'next_url': next_url})
 
@@ -31,14 +35,15 @@ def google_assets_data(ticker: str):
         market = str(request.args['market'])
 
     with MongoProvider() as mongo:
-        assets: list(Asset) = mongo.getGoogleAssetsToScrape(ticker, market)
+        assets: list(GoogleAsset) = mongo.getGoogleAssetsToScrape(
+            ticker, market)
 
     data = []
     with GoogleFinanceProvider() as google:
         for asset in assets:
             data.append(google.getAssetData(asset))
 
-    schema = AssetDataSchema(many=True)
+    schema = GoogleAssetDataSchema(many=True)
 
     return jsonify({'result': schema.dump(data)})
 
@@ -47,11 +52,28 @@ def google_assets_data(ticker: str):
 @app.route('/google/news', methods=['GET'])
 def google_news():
     with GoogleFinanceProvider() as google:
-        news: list(News) = google.getNewsStories()
+        news: list(GoogleMarketNews) = google.getNewsStories()
 
-    schema = NewsSchema(many=True)
+    schema = GoogleMarketNewsSchema(many=True)
 
     return jsonify({'result': schema.dump(news)})
+
+
+@app.route('/binance/assets', methods=['GET'])
+def binance_assets():
+    limit = int(request.args['limit'])
+    offset = int(request.args['offset'])
+
+    with BinanceProvider() as binance:
+        assets: list(BinanceAsset) = binance.getAvailableAssets(
+            limit=limit, offset=offset)
+
+    prev_url = f'/binance/assets?limit={limit}&offset={offset - limit}'
+    next_url = f'/google/assets?limit={limit}&offset={offset + limit}'
+
+    schema = BinanceAssetSchema(many=True)
+
+    return jsonify({'result': schema.dump(assets), 'prev_url': prev_url, 'next_url': next_url})
 
 
 if __name__ == '__main__':

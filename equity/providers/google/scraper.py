@@ -1,10 +1,10 @@
 import re
 from parsel import Selector
 
-from equity.models.asset.asset_model import Asset
-from equity.models.asset.asset_data_model import AssetData
+from equity.models.asset.google.asset_model import GoogleAsset
+from equity.models.asset.google.asset_data_model import GoogleAssetData
 from equity.models.asset.asset_type_enum import AssetType
-from equity.models.news.news_model import News
+from equity.models.news.google.news_model import GoogleMarketNews
 from equity.providers.google.market_data import *
 
 
@@ -149,7 +149,7 @@ class GoogleFinanceScraper:
         if self.SELECTOR.css('.yY3Lee').get():
             for i, news in enumerate(self.SELECTOR.css('.yY3Lee'), start=1):
                 data.append(
-                    News(
+                    GoogleMarketNews(
                         number=i,
                         title=news.css('.Yfwt5::text').get(),
                         link=news.css('.z4rs2b a::attr(href)').get(),
@@ -161,7 +161,7 @@ class GoogleFinanceScraper:
 
         return data
 
-    def scrapeAssetPage(self, asset: Asset):
+    def scrapeAssetPage(self, asset: GoogleAsset):
         label = self.__scrapeLabel()
         currency = self.__deduceCurrency(market=asset.market)
         price = self.__scrapePrice()
@@ -169,16 +169,16 @@ class GoogleFinanceScraper:
         about = self.__scrapeAbout()
         news = self.__scrapeNews()
 
-        return AssetData(ticker=asset.ticker,
-                         market=asset.market,
-                         google_finance_url=asset.google_finance_url,
-                         label=label,
-                         currency=currency,
-                         price=price,
-                         market_summary=market_summary,
-                         about=about,
-                         news=news
-                         )
+        return GoogleAssetData(ticker=asset.ticker,
+                               market=asset.market,
+                               google_finance_url=asset.google_finance_url,
+                               label=label,
+                               currency=currency,
+                               price=price,
+                               market_summary=market_summary,
+                               about=about,
+                               news=news
+                               )
 
     def scrapeNewsStories(self):
         news = self.__scrapeNews()

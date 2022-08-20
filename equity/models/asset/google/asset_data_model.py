@@ -1,7 +1,7 @@
 from marshmallow import Schema, fields
 
 
-class AssetData():
+class GoogleAssetData():
     def __init__(self, ticker: str, market: str, google_finance_url: str, label: str, currency: str, price: float, market_summary: dict, about: dict, news: list[dict]) -> None:
         self.ticker = ticker
         self.market = market
@@ -17,7 +17,7 @@ class AssetData():
         return '<AssetData(name={self.name!r})>'.format(self=self)
 
 
-class AssetDataSchema(Schema):
+class GoogleAssetDataSchema(Schema):
     ticker = fields.Str()
     market = fields.Str()
     google_finance_url = fields.Url()

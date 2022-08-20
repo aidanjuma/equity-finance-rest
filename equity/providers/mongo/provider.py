@@ -3,7 +3,7 @@ import pymongo
 from typing import Union
 from dotenv import load_dotenv
 
-from equity.models.asset.asset_model import Asset
+from equity.models.asset.google.asset_model import GoogleAsset
 
 load_dotenv()
 
@@ -21,13 +21,13 @@ class MongoProvider:
     def __parseAssets(self, data) -> list:
         assets = []
         for asset in data:
-            asset_obj = Asset(ticker=asset['ticker'], market=asset['market'],
-                              google_finance_url=asset['google_finance_url'])
+            asset_obj = GoogleAsset(ticker=asset['ticker'], market=asset['market'],
+                                    google_finance_url=asset['google_finance_url'])
             assets.append(asset_obj)
 
         return assets
 
-    def getGoogleAssets(self,  limit: int, offset: int) -> list:
+    def getGoogleAssets(self, limit: int, offset: int) -> list:
         collection = self.client.google.assets
         start_id = collection.find().sort('_id', pymongo.ASCENDING)
         last_id = start_id[offset]['_id']
