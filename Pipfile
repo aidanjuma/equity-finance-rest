@@ -13,6 +13,8 @@ parsel = "*"
 selenium = "*"
 webdriver-manager = "*"
 requests = "*"
+gevent = "*"
+flask-compress = "*"
 
 [dev-packages]
 

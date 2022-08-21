@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 
 from equity.models.asset.google.asset_data_model import GoogleAssetDataSchema
+from equity.models.asset.binance.asset_data_model import *
 from equity.models.asset.google.asset_model import *
 from equity.models.news.google.news_model import *
 from equity.models.asset.binance.asset_model import *
@@ -63,7 +64,6 @@ def google_news():
 def binance_assets():
     limit = int(request.args['limit'])
     offset = int(request.args['offset'])
-
     with BinanceProvider() as binance:
         assets: list(BinanceAsset) = binance.getAvailableAssets(
             limit=limit, offset=offset)
@@ -74,6 +74,16 @@ def binance_assets():
     schema = BinanceAssetSchema(many=True)
 
     return jsonify({'result': schema.dump(assets), 'prev_url': prev_url, 'next_url': next_url})
+
+
+@app.route('/binance/data/<ticker>')
+def binance_assets_data(ticker: str):
+    with BinanceProvider() as binance:
+        asset: BinanceAssetData = binance.getAssetData(ticker=ticker)
+
+    schema = BinanceAssetDataSchema()
+
+    return jsonify({'result': schema.dump(asset)})
 
 
 if __name__ == '__main__':

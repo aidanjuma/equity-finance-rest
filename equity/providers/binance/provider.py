@@ -1,5 +1,6 @@
 import requests
 from requests import HTTPError
+from equity.models.asset.binance.asset_data_model import BinanceAssetData
 
 from equity.models.asset.binance.asset_model import BinanceAsset
 
@@ -44,8 +45,8 @@ class BinanceProvider:
 
         return value
 
-    def getCurrentAveragePrice(self, symbol: str):
-        url = f'{self.BASE_URL}/avgPrice?symbol={symbol}'
+    def getCurrentPrice(self, asset: BinanceAsset):
+        url = f'{self.BASE_URL}/ticker/price?symbol={asset.ticker}'
         try:
             response = requests.get(url, headers=self.HEADERS)
             response.raise_for_status()
@@ -55,3 +56,31 @@ class BinanceProvider:
         data = response.json()
 
         return data
+
+    def getAssetData(self, ticker: str):
+        ticker = ticker.upper()
+        url = f'{self.BASE_URL}/exchangeInfo?symbol={ticker}'
+        try:
+            response = requests.get(url, headers=self.HEADERS)
+            response.raise_for_status()
+        except HTTPError as err:
+            return {'error_code': err.response.status_code, 'response': err.response.text}
+
+        data = response.json()
+        try:
+            asset = data['symbols'][0]
+        except KeyError:
+            return {'error_code': 404, 'message': f'Asset "{ticker}" not found.'}
+
+        status = asset['status']
+        base_asset = asset['baseAsset']
+        quote_asset = asset['quoteAsset']
+        asset = BinanceAsset(ticker=ticker, status=status,
+                             base_asset=base_asset, quote_asset=quote_asset)
+
+        price_data = self.getCurrentPrice(asset)
+
+        asset_data = BinanceAssetData(ticker=ticker, base_asset=asset.base_asset,
+                                      quote_asset=asset.quote_asset, price=float(price_data['price']))
+
+        return asset_data

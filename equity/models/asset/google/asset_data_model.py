@@ -14,7 +14,7 @@ class GoogleAssetData():
         self.news = news
 
     def __repr__(self) -> str:
-        return '<AssetData(name={self.name!r})>'.format(self=self)
+        return '<GoogleAssetData(name={self.name!r})>'.format(self=self)
 
 
 class GoogleAssetDataSchema(Schema):
