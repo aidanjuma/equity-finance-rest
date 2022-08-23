@@ -1,10 +1,11 @@
 from flask import Flask, request, jsonify
 
-from equity.models.asset.google.asset_data_model import GoogleAssetDataSchema
-from equity.models.asset.binance.asset_data_model import *
+from equity.helpers import checkIfMany
 from equity.models.asset.google.asset_model import *
+from equity.models.asset.google.asset_data_model import GoogleAssetDataSchema
 from equity.models.news.google.news_model import *
 from equity.models.asset.binance.asset_model import *
+from equity.models.asset.binance.asset_data_model import *
 from equity.providers.mongo.provider import MongoProvider
 from equity.providers.google.provider import GoogleFinanceProvider
 from equity.providers.binance.provider import BinanceProvider
@@ -23,7 +24,7 @@ def google_assets():
     prev_url = f'/google/assets?limit={limit}&offset={offset - limit}'
     next_url = f'/google/assets?limit={limit}&offset={offset + limit}'
 
-    schema = GoogleAssetSchema(many=True)
+    schema = GoogleAssetSchema(many=checkIfMany(assets))
 
     return jsonify({'result': schema.dump(assets), 'prev_url': prev_url, 'next_url': next_url})
 
@@ -44,7 +45,7 @@ def google_assets_data(ticker: str):
         for asset in assets:
             data.append(google.getAssetData(asset))
 
-    schema = GoogleAssetDataSchema(many=True)
+    schema = GoogleAssetDataSchema(many=checkIfMany(data))
 
     return jsonify({'result': schema.dump(data)})
 
@@ -69,7 +70,7 @@ def google_news():
     with GoogleFinanceProvider() as google:
         news: list(GoogleMarketNews) = google.getNewsStories()
 
-    schema = GoogleMarketNewsSchema(many=True)
+    schema = GoogleMarketNewsSchema(many=checkIfMany(news))
 
     return jsonify({'result': schema.dump(news)})
 
@@ -85,7 +86,7 @@ def binance_assets():
     prev_url = f'/binance/assets?limit={limit}&offset={offset - limit}'
     next_url = f'/google/assets?limit={limit}&offset={offset + limit}'
 
-    schema = BinanceAssetSchema(many=True)
+    schema = BinanceAssetSchema(many=checkIfMany(assets))
 
     return jsonify({'result': schema.dump(assets), 'prev_url': prev_url, 'next_url': next_url})
 

@@ -1,6 +1,5 @@
 import os
 import pymongo
-from typing import Union
 from dotenv import load_dotenv
 
 from equity.models.asset.google.asset_model import GoogleAsset
@@ -38,8 +37,8 @@ class MongoProvider:
 
         return assets
 
-    def getGoogleAssetsToScrape(self, ticker: str, market: Union[str, None] = None):
-        no_market = market == None
+    def getGoogleAssetsToScrape(self, ticker: str, market: str = 'N/A'):
+        no_market = market == 'N/A'
 
         collection = self.client.google.assets
         pipeline = [{'$match': {'ticker': ticker}}]

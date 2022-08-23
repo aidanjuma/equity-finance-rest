@@ -52,7 +52,6 @@ class GoogleFinanceProvider:
         finally:
             scraper = GoogleFinanceScraper(html=self.DRIVER.page_source)
             data = scraper.scrapeAssetPage(asset=asset)
-
             return data
 
     def getCurrencyData(self, base: str, quote: str):
@@ -65,9 +64,7 @@ class GoogleFinanceProvider:
         ticker = f'{base}-{quote}'
         asset: GoogleAsset = GoogleAsset(
             ticker=ticker, market='N/A', google_finance_url=f'https://google.com/finance/quote/{ticker}')
-
         data = self.getAssetData(asset=asset)
-
         return data
 
     def getNewsStories(self):
@@ -84,5 +81,4 @@ class GoogleFinanceProvider:
         finally:
             scraper = GoogleFinanceScraper(html=self.DRIVER.page_source)
             data = scraper.scrapeNewsStories()
-
             return data

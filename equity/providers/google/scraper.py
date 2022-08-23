@@ -1,6 +1,7 @@
 import re
 from parsel import Selector
 
+from equity.helpers import checkIfMany
 from equity.models.asset.google.asset_model import GoogleAsset
 from equity.models.asset.google.asset_data_model import GoogleAssetData
 from equity.models.asset.asset_type_enum import AssetType
@@ -169,11 +170,7 @@ class GoogleFinanceScraper:
         about = self.__scrapeAbout()
         news = self.__scrapeNews()
 
-        many = False
-        if len(news) > 1:
-            many = True
-
-        news_schema = GoogleMarketNewsSchema(many=many)
+        news_schema = GoogleMarketNewsSchema(many=checkIfMany(news))
 
         return GoogleAssetData(ticker=asset.ticker,
                                market=asset.market,
