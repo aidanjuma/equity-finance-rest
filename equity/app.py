@@ -16,7 +16,6 @@ app = Flask(__name__)
 def google_assets():
     limit = int(request.args['limit'])
     offset = int(request.args['offset'])
-
     with MongoProvider() as mongo:
         assets: list(GoogleAsset) = mongo.getGoogleAssets(
             limit=limit, offset=offset)
@@ -31,6 +30,7 @@ def google_assets():
 
 @app.route('/google/data/<ticker>', methods=['GET'])
 def google_assets_data(ticker: str):
+    ticker = ticker.upper()
     market = None
     if request.args:
         market = str(request.args['market'])
@@ -49,7 +49,21 @@ def google_assets_data(ticker: str):
     return jsonify({'result': schema.dump(data)})
 
 
-# Get news top stories; TODO -> Local, World Markets?
+@app.route('/google/data/currency', methods=['GET'])
+def google_currency():
+    base = request.args['base']
+    quote = request.args['quote']
+    with GoogleFinanceProvider() as google:
+        try:
+            asset = google.getCurrencyData(base=base, quote=quote)
+        except Exception:
+            return jsonify({'error_code': 404, 'message': 'One or more of currencies provided was invalid; please try different value(s).'})
+
+    schema = GoogleAssetDataSchema()
+
+    return jsonify({'result': schema.dump(asset)})
+
+
 @app.route('/google/news', methods=['GET'])
 def google_news():
     with GoogleFinanceProvider() as google:
@@ -76,7 +90,7 @@ def binance_assets():
     return jsonify({'result': schema.dump(assets), 'prev_url': prev_url, 'next_url': next_url})
 
 
-@app.route('/binance/data/<ticker>')
+@app.route('/binance/data/<ticker>', methods=['GET'])
 def binance_assets_data(ticker: str):
     with BinanceProvider() as binance:
         asset: BinanceAssetData = binance.getAssetData(ticker=ticker)

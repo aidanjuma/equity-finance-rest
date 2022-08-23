@@ -9,6 +9,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 from equity.models.asset.google.asset_model import GoogleAsset
 from equity.providers.google.scraper import GoogleFinanceScraper
+from equity.providers.google.market_data import iso4217_currencies
 
 
 class GoogleFinanceProvider:
@@ -53,6 +54,21 @@ class GoogleFinanceProvider:
             data = scraper.scrapeAssetPage(asset=asset)
 
             return data
+
+    def getCurrencyData(self, base: str, quote: str):
+        base = base.upper()
+        quote = quote.upper()
+
+        if base and quote not in iso4217_currencies:
+            raise Exception
+
+        ticker = f'{base}-{quote}'
+        asset: GoogleAsset = GoogleAsset(
+            ticker=ticker, market='N/A', google_finance_url=f'https://google.com/finance/quote/{ticker}')
+
+        data = self.getAssetData(asset=asset)
+
+        return data
 
     def getNewsStories(self):
         try:

@@ -4,7 +4,7 @@ from parsel import Selector
 from equity.models.asset.google.asset_model import GoogleAsset
 from equity.models.asset.google.asset_data_model import GoogleAssetData
 from equity.models.asset.asset_type_enum import AssetType
-from equity.models.news.google.news_model import GoogleMarketNews
+from equity.models.news.google.news_model import *
 from equity.providers.google.market_data import *
 
 
@@ -169,6 +169,12 @@ class GoogleFinanceScraper:
         about = self.__scrapeAbout()
         news = self.__scrapeNews()
 
+        many = False
+        if len(news) > 1:
+            many = True
+
+        news_schema = GoogleMarketNewsSchema(many=many)
+
         return GoogleAssetData(ticker=asset.ticker,
                                market=asset.market,
                                google_finance_url=asset.google_finance_url,
@@ -177,7 +183,7 @@ class GoogleFinanceScraper:
                                price=price,
                                market_summary=market_summary,
                                about=about,
-                               news=news
+                               news=news_schema.dump(news)
                                )
 
     def scrapeNewsStories(self):
